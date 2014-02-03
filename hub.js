@@ -68,7 +68,12 @@ function() {
 
     Hub.prototype.unsubscribe = function(topic, callback, context) {
 	context = context || null;
-	var subscriptions = this._subscriptions[topic] || [];
+	if (! (topic in this._subscriptions) )
+	{
+	    throw new Error('There is no topic: "'+topic+'" to unsubscribe');
+	}
+
+	var subscriptions = this._subscriptions[topic];
 	var i=0, length= subscriptions.length, subs = null;
 	for (;i < length;i++) {
 	    if (subscriptions[i].callback === callback &&
@@ -80,9 +85,10 @@ function() {
                 length--;
 	    }
 	}
-	if (!callback || subscriptions.length == 0)
+	if (callback === undefined || subscriptions.length == 0) {
 	    delete this._subscriptions[topic];
-	    return this._rpc.call('HubSrv.unsubscribe',['gwts', topic]);
+	    return this._rpc.call('HubSrv.unsubscribe',['gtws', topic]);	    
+	}
 	return true;
     };
 
