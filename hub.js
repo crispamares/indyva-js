@@ -7,7 +7,7 @@ function() {
 
 	path = path || 'ws';
 	port = port || 8081;
-	server = server || 'localhost:'+String(port);
+	server = server || window.location.hostname+':'+String(port);
 
 	this._subscriptions = {};
 	this._rpc = WsRpc.instance();
