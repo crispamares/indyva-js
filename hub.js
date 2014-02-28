@@ -92,11 +92,14 @@ function() {
 	return true;
     };
 
+    /**
+     * Unsubscribe to everithing
+     * @ return: when.promise
+     */
     Hub.prototype.clear = function() {
-	for (topic in this._subscriptions) {
-	    if (! this._subscriptions.hasOwnProperty(topic)) continue;
-	    this.unsubscribe(topic);
-	}
+//	var deferred = when.defer();
+	this._subscriptions = {};
+	return this._rpc.call('HubSrv.clear',['gtws']);
     };
 
 
