@@ -92,6 +92,14 @@ function() {
 	return true;
     };
 
+    Hub.prototype.clear = function() {
+	for (topic in this._subscriptions) {
+	    if (! this._subscriptions.hasOwnProperty(topic)) continue;
+	    this.unsubscribe(topic);
+	}
+    };
+
+
     Hub.prototype.internal_publish = function(topic, msg) {
 	var subscriptions = this._subscriptions[topic] || [];
 	var i=0, length = subscriptions.length, subs = null;
