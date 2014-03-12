@@ -1,6 +1,6 @@
 
-define(["when", "./reconnecting-websocket"],
-function(when, WebSocket) {
+define(["when", "reconnecting-websocket"],
+function(when, ReconnectingWebSocket) {
 
     var WsRpc = function(server, path, port){
 	var self = this;
@@ -11,7 +11,7 @@ function(when, WebSocket) {
 
 	this._out_queue = [];
 	this._futures = {};
-	this.ws = new WebSocket('ws://' + server + '/' + path);
+	this.ws = new ReconnectingWebSocket('ws://' + server + '/' + path);
 	this.ws.onmessage = function(event) { self._onmessage(event); };
 	this.ws.onopen = function(event) { self._flush(); };
     };

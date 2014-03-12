@@ -1,5 +1,5 @@
 define(['ws-rpc', "./reconnecting-websocket"],
-function(WsRpc, WebSocket) {
+function(WsRpc, ReconnectingWebSocket) {
 
     var Hub = function(server, path, port){
 	var self = this;
@@ -12,7 +12,7 @@ function(WsRpc, WebSocket) {
 	this._rpc = WsRpc.instance();
 	this._rpc.call('HubSrv.new_gateway',['gtws','ws', port]).then( 
 	    function () {
-		self.ws = new WebSocket('ws://' + server + '/' + path);	
+		self.ws = new ReconnectingWebSocket('ws://' + server + '/' + path);	
 	    	self.ws.onmessage = function(event) { self._onmessage(event); };
 	    });
 
