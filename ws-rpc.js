@@ -1,7 +1,6 @@
 
-define(["when"],
-function() {
-    var when = require('when');
+define(["when", "./reconnecting-websocket"],
+function(when, WebSocket) {
 
     var WsRpc = function(server, path, port){
 	var self = this;

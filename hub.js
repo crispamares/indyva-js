@@ -1,6 +1,5 @@
-define(['ws-rpc'],
-function() {
-    var WsRpc = require('ws-rpc');
+define(['ws-rpc', "./reconnecting-websocket"],
+function(WsRpc, WebSocket) {
 
     var Hub = function(server, path, port){
 	var self = this;
