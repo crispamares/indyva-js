@@ -6,7 +6,7 @@ function(WsRpc, WebSocket) {
 
 	path = path || 'ws';
 	port = port || 8081;
-	server = server || 'localhost:'+String(port);
+	server = server || window.location.hostname+':'+String(port);
 
 	this._subscriptions = {};
 	this._rpc = WsRpc.instance();
@@ -90,6 +90,17 @@ function(WsRpc, WebSocket) {
 	}
 	return true;
     };
+
+    /**
+     * Unsubscribe to everithing
+     * @ return: when.promise
+     */
+    Hub.prototype.clear = function() {
+//	var deferred = when.defer();
+	this._subscriptions = {};
+	return this._rpc.call('HubSrv.clear',['gtws']);
+    };
+
 
     Hub.prototype.internal_publish = function(topic, msg) {
 	var subscriptions = this._subscriptions[topic] || [];

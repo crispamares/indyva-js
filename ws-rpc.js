@@ -7,7 +7,7 @@ function(when, WebSocket) {
 
 	path = path || 'ws';
 	port = port || 8080;
-	server = server || 'localhost:'+String(port);
+	server = server || window.location.hostname+':'+String(port);
 
 	this._out_queue = [];
 	this._futures = {};
