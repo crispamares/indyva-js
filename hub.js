@@ -5,7 +5,7 @@ function(WsRpc, ReconnectingWebSocket) {
 	var self = this;
 
 	path = path || 'ws';
-	port = port || 8081;
+	port = port || parseInt(window.location.port) + 1;
 	server = server || window.location.hostname+':'+String(port);
 
 	this._subscriptions = {};

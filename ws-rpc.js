@@ -6,7 +6,7 @@ function(when, ReconnectingWebSocket) {
 	var self = this;
 
 	path = path || 'ws';
-	port = port || 8080;
+	port = port || window.location.port;
 	server = server || window.location.hostname+':'+String(port);
 
 	this._out_queue = [];
