@@ -1,18 +1,14 @@
-define(['ws-rpc', "./reconnecting-websocket"],
-function(WsRpc, ReconnectingWebSocket) {
+define(["./reconnecting-websocket"],
+function(ReconnectingWebSocket) {
 
-    var Hub = function(server, path, port){
+    var Hub = function(server, path, port, rpc){
 	var self = this;
 
-	path = path || 'ws';
-	port = port || parseInt(window.location.port) + 1;
-	server = server || window.location.hostname+':'+String(port);
-
 	this._subscriptions = {};
-	this._rpc = WsRpc.instance();
+	this._rpc = rpc;
 	this._rpc.call('HubSrv.new_gateway',['gtws','ws', port]).then( 
 	    function () {
-		self.ws = new ReconnectingWebSocket('ws://' + server + '/' + path);	
+		self.ws = new ReconnectingWebSocket('ws://' + server + ':' +String(port)+ '/' + path);	
 	    	self.ws.onmessage = function(event) { self._onmessage(event); };
 	    });
 
@@ -24,17 +20,6 @@ function(WsRpc, ReconnectingWebSocket) {
     Hub.prototype.ws = null;
     /// Object topic: callback
     Hub.prototype._subscriptions = {};
-    /// The installed instance
-    Hub.prototype._instance = null;
-
-    Hub.instance = function() {
-	if (Hub.prototype._instance == null) Hub.prototype._instance = new Hub();
-	return Hub.prototype._instance;
-    };
-    Hub.prototype.install = function() {
-	if (Hub.prototype._instance) throw new Error("Hub already installed");
-	Hub.prototype._instance = this;
-    };
     
     Hub.prototype.publish = function(topic, msg) {
 	return this._rpc.call('HubSrv.publish',[topic, msg]);

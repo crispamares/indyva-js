@@ -5,15 +5,13 @@ function(when, ReconnectingWebSocket) {
     var WsRpc = function(server, path, port){
 	var self = this;
 
-	path = path || 'ws';
-	port = port || window.location.port;
-	server = server || window.location.hostname+':'+String(port);
-
 	this._out_queue = [];
 	this._futures = {};
-	this.ws = new ReconnectingWebSocket('ws://' + server + '/' + path);
+	this.ws = new ReconnectingWebSocket('ws://' + server + ':' + String(port) + '/' + path);
 	this.ws.onmessage = function(event) { self._onmessage(event); };
 	this.ws.onopen = function(event) { self._flush(); };
+
+
     };
 
     /// Holding the WebSocket on default getsocket.
@@ -24,18 +22,8 @@ function(when, ReconnectingWebSocket) {
     WsRpc.prototype._current_id = 1;
     /// The not ready queue
     WsRpc.prototype._out_queue = [];
-    /// The installed instance
-    WsRpc.prototype._instance = null;
-
-    // Class method
-    WsRpc.instance = function() {
-	if (WsRpc.prototype._instance == null) WsRpc.prototype._instance = new WsRpc();
-	return WsRpc.prototype._instance;
-    };
-    WsRpc.prototype.install = function() {
-	if (WsRpc.prototype._instance) throw new Error("WsRpc already installed");
-	WsRpc.prototype._instance = this;
-    };
+    /// The list of extenders
+    WsRpc.prototype._extenders = [];
 
     /**
      * @fn call
@@ -54,6 +42,10 @@ function(when, ReconnectingWebSocket) {
 	    id      : this._current_id++  // Increase the id counter to match request/response
 	};
 
+	this._extenders.forEach(function(extender) {
+	    extender.modifyRequest(request);
+	});
+	
 	var deferred = when.defer();
 	this._futures[request.id] = deferred;
 
@@ -62,6 +54,22 @@ function(when, ReconnectingWebSocket) {
 
 	return deferred.promise;
     };   
+
+    /**
+     * This is an extension point mechanism to add objects that can
+     * modify the request before sending it. The 'extenders' need to
+     * have a method named `modifyRequest` which accepts one param,
+     * the JSON-RPC request object.
+     * 
+     * @fn extend
+     * @memberof WsRpc
+     *
+     * @param extender    An object with a method `modifyRequest`
+     */
+    WsRpc.prototype.extend = function(extender) {
+	this._extenders.push(extender);
+    };
+
 
     /**
      * Internal method that sends a message through the Web Socket
