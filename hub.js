@@ -7,7 +7,7 @@ function(ReconnectingWebSocket) {
 	this._subscriptions = {};
 	this._rpc = rpc;
 	this._rpc.call('HubSrv.new_gateway',['gtws','ws', port]).then( 
-	    function () {
+	    function (port) {
 		self.ws = new ReconnectingWebSocket('ws://' + server + ':' +String(port)+ '/' + path);	
 	    	self.ws.onmessage = function(event) { self._onmessage(event); };
 	    });
