@@ -64,7 +64,7 @@ function(when, ReconnectingWebSocket, WsRpc, Hub) {
     Object.defineProperty(Context.prototype, "hub", {
 	get: function(){
 	    if (this._hub === null) {
-		this._hub = new Hub(this.server, this.path, this.port+1, this.rpc);
+		this._hub = new Hub(this.server, this.path, null, this.rpc);
 	    }
 	    return this._hub;
 	}
@@ -80,14 +80,14 @@ function(when, ReconnectingWebSocket, WsRpc, Hub) {
     Context.prototype.modifyRequest = function (request) {
 	if (this.session === null) return;
 	var _context = {session: this.session};
-	if (typeof request.params === 'object') {
-	    request.params._context = _context;
-	}
-	else {
+	if (Array.isArray(request.params)) {
 	    request.params = {
 		_params: request.params,
 		_context: _context
 	    };
+	} 
+	else {
+	    request.params._context = _context;
 	}
     };
 
@@ -103,6 +103,7 @@ function(when, ReconnectingWebSocket, WsRpc, Hub) {
 	var self = this;
 	var promise = this.rpc.call('SessionSrv.open_session', [session])
 	    .then(function(){self.session = session;});
+	this.session = session;
 	return promise;
     };
 
