@@ -1,14 +1,15 @@
 define(["./reconnecting-websocket"],
 function(ReconnectingWebSocket) {
 
-    var Hub = function(server, path, port, rpc){
+    var Hub = function(server, port, rpc, gateway){
 	var self = this;
 
 	this._subscriptions = {};
 	this._rpc = rpc;
-	this._rpc.call('HubSrv.new_gateway',['gtws','ws', port]).then( 
+	this._gateway = gateway;
+	this._rpc.call('HubSrv.new_gateway',[gateway,'ws', port]).then( 
 	    function (port) {
-		self.ws = new ReconnectingWebSocket('ws://' + server + ':' +String(port)+ '/' + path);	
+		self.ws = new ReconnectingWebSocket('ws://' + server + ':' +String(port)+ '/hub/' + gateway);	
 	    	self.ws.onmessage = function(event) { self._onmessage(event); };
 	    });
 
@@ -34,9 +35,9 @@ function(ReconnectingWebSocket) {
 					 context: context});
 	if (new_topic) {
 	    if (only_once)
-		return this._rpc.call('HubSrv.subscribe_once',['gtws', topic]);	    
+		return this._rpc.call('HubSrv.subscribe_once',[this._gateway, topic]);	    
 	    else
-		return this._rpc.call('HubSrv.subscribe',['gtws', topic]);	    
+		return this._rpc.call('HubSrv.subscribe',[this._gateway, topic]);	    
 	}
 
 	return true;
@@ -71,7 +72,7 @@ function(ReconnectingWebSocket) {
 	}
 	if (callback === undefined || subscriptions.length == 0) {
 	    delete this._subscriptions[topic];
-	    return this._rpc.call('HubSrv.unsubscribe',['gtws', topic]);	    
+	    return this._rpc.call('HubSrv.unsubscribe',[this._gateway, topic]);	    
 	}
 	return true;
     };
@@ -83,7 +84,7 @@ function(ReconnectingWebSocket) {
     Hub.prototype.clear = function() {
 //	var deferred = when.defer();
 	this._subscriptions = {};
-	return this._rpc.call('HubSrv.clear',['gtws']);
+	return this._rpc.call('HubSrv.clear',[this._gateway]);
     };
 
 

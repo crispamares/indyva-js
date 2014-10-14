@@ -64,7 +64,7 @@ function(when, ReconnectingWebSocket, WsRpc, Hub) {
     Object.defineProperty(Context.prototype, "hub", {
 	get: function(){
 	    if (this._hub === null) {
-		this._hub = new Hub(this.server, this.path, null, this.rpc);
+		this._hub = new Hub(this.server, this.port+1, this.rpc, this.session);
 	    }
 	    return this._hub;
 	}
